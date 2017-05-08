@@ -107,11 +107,16 @@ namespace Demo02.Controllers
 			    return BadRequest();
 		    }
 
-			Product product = new Product { ProductId = id, Title = "Test product" };
+		    var product = _appContext.Product.Find(id);
+		    if (product == null)
+		    {
+			    return NotFound();
+		    }
 
 			patchDocument.ApplyTo(product);
+		    _appContext.SaveChanges();
 
-		    return NoContent();
+		    return Ok();
 	    }
 
 		[HttpGet("{id}/tags")]
