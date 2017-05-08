@@ -92,9 +92,14 @@ namespace Demo02.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(Guid id)
         {
-			string sql = "DELETE FROM Products WHERE id = {0}";
+	        var product = _appContext.Product.Find(id);
+	        if (product == null)
+	        {
+		        return NotFound();
+	        }
 
-	        _appContext.Database.ExecuteSqlCommand(sql, parameters: id);
+	        _appContext.Product.Remove(product);
+	        _appContext.SaveChanges();
 
 		    return NoContent();
         }
