@@ -23,7 +23,7 @@ namespace Demo02.Controllers
 		[HttpHead]
         public IActionResult Get()
 	    {
-		    List<Product> products = _appContext.Product.Include(x => x.Tags).ToList();
+		    List<Product> products = _appContext.Products.Include(x => x.Tags).ToList();
 
 			return Ok(products);
         }
@@ -31,7 +31,7 @@ namespace Demo02.Controllers
         [HttpGet("{id}",  Name = "GetProduct")]
         public IActionResult Get(Guid id)
         {
-	        Product product = _appContext.Product.Include(x => x.Tags).FirstOrDefault(x => x.ProductId == id);
+	        Product product = _appContext.Products.Include(x => x.Tags).FirstOrDefault(x => x.ProductId == id);
 
 	        if (product == null)
 	        {
@@ -60,7 +60,7 @@ namespace Demo02.Controllers
 		        return BadRequest(ModelState);
 	        }
 
-	        _appContext.Product.Add(model);
+	        _appContext.Products.Add(model);
 	        _appContext.SaveChanges();
 
 	        return CreatedAtRoute("GetProduct", new { id = model.ProductId }, model);
@@ -69,7 +69,7 @@ namespace Demo02.Controllers
         [HttpPut("{id}")]
         public IActionResult Put(Guid id, [FromBody]Product model)
         {
-	        var product = _appContext.Product.Find(id);
+	        var product = _appContext.Products.Find(id);
 	        if (product == null)
 	        {
 		        return NotFound();
@@ -92,13 +92,13 @@ namespace Demo02.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(Guid id)
         {
-	        var product = _appContext.Product.Find(id);
+	        var product = _appContext.Products.Find(id);
 	        if (product == null)
 	        {
 		        return NotFound();
 	        }
 
-	        _appContext.Product.Remove(product);
+	        _appContext.Products.Remove(product);
 	        _appContext.SaveChanges();
 
 		    return NoContent();
@@ -112,7 +112,7 @@ namespace Demo02.Controllers
 			    return BadRequest();
 		    }
 
-		    var product = _appContext.Product.Find(id);
+		    var product = _appContext.Products.Find(id);
 		    if (product == null)
 		    {
 			    return NotFound();
@@ -127,7 +127,7 @@ namespace Demo02.Controllers
 		[HttpGet("{id}/tags")]
 		public IActionResult GetProductTags(Guid id)
 		{
-			var product = _appContext.Product.Include(x => x.Tags).FirstOrDefault(x => x.ProductId == id);
+			var product = _appContext.Products.Include(x => x.Tags).FirstOrDefault(x => x.ProductId == id);
 
 			if (product == null)
 			{

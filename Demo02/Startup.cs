@@ -33,7 +33,6 @@ namespace Demo02
 
 		    var mvc = services.AddMvc(setup =>
 		    {
-			    setup.ReturnHttpNotAcceptable = true;
 			    setup.InputFormatters.Add(new XmlSerializerInputFormatter());
 			    setup.OutputFormatters.Add(new XmlSerializerOutputFormatter());
 		    });
@@ -75,7 +74,7 @@ namespace Demo02
 
 	    private void AddTestData(Context dbContext)
 	    {
-		    dbContext.Product.Add(
+		    dbContext.Products.Add(
 				new Product
 				{
 					ProductId = Guid.Parse("eeca4000-0dbb-447c-a4b7-d836559f5278"),
@@ -88,7 +87,7 @@ namespace Demo02
 				}
 		    );
 
-			dbContext.Product.Add(
+			dbContext.Products.Add(
 				new Product
 				{
 					ProductId = Guid.NewGuid(),
