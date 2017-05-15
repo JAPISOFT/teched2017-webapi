@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Serialization;
 
 namespace Demo02
 {
@@ -33,18 +34,24 @@ namespace Demo02
 
 		    var mvc = services.AddMvc(setup =>
 		    {
-			    setup.InputFormatters.Add(new XmlSerializerInputFormatter());
-			    setup.OutputFormatters.Add(new XmlSerializerOutputFormatter());
+			    //setup.InputFormatters.Add(new XmlSerializerInputFormatter());
+			    //setup.OutputFormatters.Add(new XmlSerializerOutputFormatter());
 		    });
 
 		    mvc.AddJsonOptions(options =>
 		    {
-			    //options.SerializerSettings.
+			    //if (options.SerializerSettings.ContractResolver != null)
+			    //{
+				   // options.SerializerSettings.ContractResolver = new DefaultContractResolver()
+				   // {
+					  //  NamingStrategy = new DefaultNamingStrategy()
+				   // };
+			    //}
 		    });
 
 		    services.AddCors();
 		    services.AddSwaggerGen();
-		    services.AddHttpCacheHeaders();
+		    //services.AddHttpCacheHeaders();
 	    }
 
 	    public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
@@ -57,7 +64,7 @@ namespace Demo02
 			app.UseCors(options => { options.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin(); });
 			app.UseSwagger();
 			app.UseSwaggerUi("doc");
-			app.UseHttpCacheHeaders();
+			//app.UseHttpCacheHeaders();
 
 			app.UseExceptionHandler(exc =>
 	        {

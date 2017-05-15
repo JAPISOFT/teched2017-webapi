@@ -119,9 +119,16 @@ namespace Demo02.Controllers
 		    }
 
 			patchDocument.ApplyTo(product);
+
+		    TryValidateModel(product);
+		    if (!ModelState.IsValid)
+		    {
+			    return BadRequest(ModelState);
+		    }
+
 		    _appContext.SaveChanges();
 
-		    return Ok();
+		    return NoContent();
 	    }
 
 		[HttpGet("{id}/tags")]
