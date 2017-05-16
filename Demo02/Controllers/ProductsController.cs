@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using Demo02.ApiModels;
 using Demo02.Repositories;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Demo02.Controllers
 {
+	//[EnableCors("Default")]
     [Route("api/[controller]")]
     public class ProductsController : Controller
     {

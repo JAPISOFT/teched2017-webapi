@@ -49,10 +49,17 @@ namespace Demo02
 			    //}
 		    });
 
-		    services.AddCors();
-		    services.AddSwaggerGen();
-		    //services.AddHttpCacheHeaders();
-	    }
+			//services.AddCors(o =>
+			//{
+			//	o.AddPolicy("Default", cfg =>
+			//	{
+			//		cfg.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
+			//	});
+			//});
+
+			//services.AddSwaggerGen();
+			//services.AddHttpCacheHeaders();
+		}
 
 	    public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
@@ -61,19 +68,21 @@ namespace Demo02
 
             app.UseMvc();
 
-			app.UseCors(options => { options.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin(); });
-			app.UseSwagger();
-			app.UseSwaggerUi("doc");
+			//app.UseCors("Default");
+			//app.UseSwagger();
+			//app.UseSwaggerUi("doc");
 			//app.UseHttpCacheHeaders();
 
-			app.UseExceptionHandler(exc =>
-	        {
-		        exc.Run(async context =>
-		        {
-			        context.Response.StatusCode = 500;
-			        await context.Response.WriteAsync("Unexpected error happened");
-		        });
-	        });
+	        app.UseDeveloperExceptionPage();
+
+			//app.UseExceptionHandler(exc =>
+	  //      {
+		 //       exc.Run(async context =>
+		 //       {
+			//        context.Response.StatusCode = 500;
+			//        await context.Response.WriteAsync("Unexpected error happened");
+		 //       });
+	  //      });
 
 			Context dbContext = app.ApplicationServices.GetService<Context>();
 			AddTestData(dbContext);
