@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
-using Demo02.Lib.ApiModels.Base;
 using Demo02.Lib.ApiModels.Products;
+using Demo02.Lib.Entities;
 using Demo02.Lib.Repositories;
 
 namespace Demo02.Lib.Facades
@@ -42,6 +41,19 @@ namespace Demo02.Lib.Facades
 			    : null;
 
 		    return result;
+	    }
+
+	    public async Task<ProductApiModel> CreateProduct(ProductApiModelCreate model)
+	    {
+		    var product = new Product()
+		    {
+			    Title = model.Title,
+		    };
+
+			_uow.Products.Insert(product);
+			_uow.Save();
+
+		    return await GetProduct(product.ProductId);
 	    }
     }
 }
