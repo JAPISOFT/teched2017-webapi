@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Demo02.ApiModels
+namespace Demo02.Lib.Entities
 {
     public class Product : IValidatableObject
     {

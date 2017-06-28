@@ -6,7 +6,7 @@
 	    {
 		    errorMessage = null;
 
-		    if (title.StartsWith("C"))
+		    if (title != null && title.StartsWith("C"))
 		    {
 			    errorMessage = "Title cannot starts with C";
 			    return false;

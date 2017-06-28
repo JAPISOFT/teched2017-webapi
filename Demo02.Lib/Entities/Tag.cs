@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Demo02.ApiModels
+namespace Demo02.Lib.Entities
 {
     public class Tag
     {

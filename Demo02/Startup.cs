@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Demo02.ApiModels;
-using Demo02.Repositories;
+using Demo02.Lib.Entities;
+using Demo02.Lib.Facades;
+using Demo02.Lib.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -21,8 +22,8 @@ namespace Demo02
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
+                .AddJsonFile("appsettings.json", false, true)
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true)
                 .AddEnvironmentVariables();
 
             Configuration = builder.Build();
@@ -30,24 +31,27 @@ namespace Demo02
 
 	    public void ConfigureServices(IServiceCollection services)
 	    {
-		    services.AddDbContext<Context>();
+		    services.AddDbContext<DemoContext>();
+			services.AddScoped<ProductFacade>();
+			services.AddScoped<ProductRepository>();
+			services.AddScoped<UnitOfWork>();
 
 		    var mvc = services.AddMvc(setup =>
 		    {
-			    //setup.InputFormatters.Add(new XmlSerializerInputFormatter());
-			    //setup.OutputFormatters.Add(new XmlSerializerOutputFormatter());
-		    });
+				setup.InputFormatters.Add(new XmlSerializerInputFormatter());
+				setup.OutputFormatters.Add(new XmlSerializerOutputFormatter());
+			});
 
 		    mvc.AddJsonOptions(options =>
 		    {
-			    //if (options.SerializerSettings.ContractResolver != null)
-			    //{
-				   // options.SerializerSettings.ContractResolver = new DefaultContractResolver()
-				   // {
-					  //  NamingStrategy = new DefaultNamingStrategy()
-				   // };
-			    //}
-		    });
+				if (options.SerializerSettings.ContractResolver != null)
+				{
+					options.SerializerSettings.ContractResolver = new DefaultContractResolver()
+					{
+						NamingStrategy = new DefaultNamingStrategy()
+					};
+				}
+			});
 
 			//services.AddCors(o =>
 			//{
@@ -57,8 +61,8 @@ namespace Demo02
 			//	});
 			//});
 
-			//services.AddSwaggerGen();
-			//services.AddHttpCacheHeaders();
+			services.AddSwaggerGen();
+			services.AddHttpCacheHeaders();
 		}
 
 	    public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
@@ -69,26 +73,26 @@ namespace Demo02
             app.UseMvc();
 
 			//app.UseCors("Default");
-			//app.UseSwagger();
-			//app.UseSwaggerUi("doc");
-			//app.UseHttpCacheHeaders();
+			app.UseSwagger();
+			app.UseSwaggerUi("doc");
+			app.UseHttpCacheHeaders();
 
-	        app.UseDeveloperExceptionPage();
+			app.UseDeveloperExceptionPage();
 
-			//app.UseExceptionHandler(exc =>
-	  //      {
-		 //       exc.Run(async context =>
-		 //       {
-			//        context.Response.StatusCode = 500;
-			//        await context.Response.WriteAsync("Unexpected error happened");
-		 //       });
-	  //      });
+			app.UseExceptionHandler(exc =>
+			{
+				exc.Run(async context =>
+				{
+					context.Response.StatusCode = 500;
+					await context.Response.WriteAsync("Unexpected error happened");
+				});
+			});
 
-			Context dbContext = app.ApplicationServices.GetService<Context>();
+			DemoContext dbContext = app.ApplicationServices.GetService<DemoContext>();
 			AddTestData(dbContext);
 		}
 
-	    private void AddTestData(Context dbContext)
+	    private void AddTestData(DemoContext dbContext)
 	    {
 		    dbContext.Products.Add(
 				new Product
@@ -120,3 +124,4 @@ namespace Demo02
 	    }
     }
 }
+

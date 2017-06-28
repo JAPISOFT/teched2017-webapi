@@ -1,157 +1,148 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Demo02.ApiModels;
-using Demo02.Repositories;
-using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.JsonPatch;
+using System.Threading.Tasks;
+using Demo02.Lib.ApiModels.Products;
+using Demo02.Lib.Facades;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Demo02.Controllers
 {
-	//[EnableCors("Default")]
     [Route("api/[controller]")]
-    public class ProductsController : Controller
+    public class ProductsController : ApiController
     {
-		private readonly Context _appContext;
+	    private readonly ProductFacade _productFacade;
 
-	    public ProductsController(Context appContext)
+	    public ProductsController(ProductFacade productFacade)
 	    {
-		    this._appContext = appContext;
+		    _productFacade = productFacade;
 	    }
 
 	    [HttpGet]
 		[HttpHead]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
 	    {
-		    List<Product> products = _appContext.Products.Include(x => x.Tags).ToList();
+		    var result = await _productFacade.GetProducts();
 
-			return Ok(products);
-        }
-
-        [HttpGet("{id}",  Name = "GetProduct")]
-        public IActionResult Get(Guid id)
-        {
-	        Product product = _appContext.Products.Include(x => x.Tags).FirstOrDefault(x => x.ProductId == id);
-
-	        if (product == null)
-	        {
-		        return NotFound();
-	        }
-
-			return Ok(product);
-		}
-
-        [HttpPost]
-        public IActionResult Post([FromBody]Product model)
-        {
-	        if (model == null)
-	        {
-		        return BadRequest();
-	        }
-
-	        string err;
-	        if (!ValidationService.ValidateTitle(model.Title, out err))
-	        {
-		        ModelState.AddModelError("Title", err);
-	        }
-
-	        if (!ModelState.IsValid)
-	        {
-		        return BadRequest(ModelState);
-	        }
-
-	        _appContext.Products.Add(model);
-	        _appContext.SaveChanges();
-
-	        return CreatedAtRoute("GetProduct", new { id = model.ProductId }, model);
-        }
-
-        [HttpPut("{id}")]
-        public IActionResult Put(Guid id, [FromBody]Product model)
-        {
-	        var product = _appContext.Products.Find(id);
-	        if (product == null)
-	        {
-		        return NotFound();
-	        }
-
-	        product.Title = model.Title;
-
-	        try
-	        {
-		        _appContext.SaveChanges();
-	        }
-	        catch (Exception ex)
-	        {
-		        return BadRequest(ex.Message);
-	        }
-
-	        return Ok(model);
-        }
-
-        [HttpDelete("{id}")]
-        public IActionResult Delete(Guid id)
-        {
-	        var product = _appContext.Products.Find(id);
-	        if (product == null)
-	        {
-		        return NotFound();
-	        }
-
-	        _appContext.Products.Remove(product);
-	        _appContext.SaveChanges();
-
-		    return NoContent();
-        }
-
-	    [HttpPatch("{id}")]
-	    public IActionResult Patch(Guid id, [FromBody]JsonPatchDocument<Product> patchDocument)
-	    {
-		    if (patchDocument == null)
-		    {
-			    return BadRequest();
-		    }
-
-		    var product = _appContext.Products.Find(id);
-		    if (product == null)
-		    {
-			    return NotFound();
-		    }
-
-			patchDocument.ApplyTo(product);
-
-		    TryValidateModel(product);
-		    if (!ModelState.IsValid)
-		    {
-			    return BadRequest(ModelState);
-		    }
-
-		    _appContext.SaveChanges();
-
-		    return NoContent();
+		    return Ok(result);
 	    }
 
-		[HttpGet("{id}/tags")]
-		public IActionResult GetProductTags(Guid id)
-		{
-			var product = _appContext.Products.Include(x => x.Tags).FirstOrDefault(x => x.ProductId == id);
+        [HttpGet("{id}",  Name = "GetProduct")]
+        public async Task<IActionResult> Get(Guid id)
+        {
+	        var result = await _productFacade.GetProduct(id);
+	        if (result == null)
+	        {
+		        return NotFound("Produkt nebyl nalezen");
+	        }
 
-			if (product == null)
+	        return Ok(result);
+		}
+
+		[HttpPost]
+		public IActionResult Post([FromBody]ProductApiModelCreate model)
+		{
+			if (model == null)
 			{
-				return NotFound();
+				return BadRequest("Data produktu nebyla nalezena");
 			}
 
-			return Ok(product.Tags);
+			string err;
+			if (!ValidationService.ValidateTitle(model.Title, out err))
+			{
+				ModelState.AddModelError("Title", err);
+			}
+
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ModelState);
+			}
+
+			return CreatedAtRoute("GetProduct", new { id = Guid.NewGuid() }, model);
 		}
 
-		[HttpOptions("{id}/tags")]
-		public IActionResult GetProductTagsOptions(Guid id)
-		{
-			Response.Headers.Add("Allow",  "GET,OPTIONS");
+		//      [HttpPut("{id}")]
+		//      public IActionResult Put(Guid id, [FromBody]Product model)
+		//      {
+		//       var product = _appContext.Products.Find(id);
+		//       if (product == null)
+		//       {
+		//        return NotFound();
+		//       }
 
-			return Ok();
-		}
+		//       product.Title = model.Title;
+
+		//       try
+		//       {
+		//        _appContext.SaveChanges();
+		//       }
+		//       catch (Exception ex)
+		//       {
+		//        return BadRequest(ex.Message);
+		//       }
+
+		//       return Ok(model);
+		//      }
+
+		//      [HttpDelete("{id}")]
+		//      public IActionResult Delete(Guid id)
+		//      {
+		//       var product = _appContext.Products.Find(id);
+		//       if (product == null)
+		//       {
+		//        return NotFound();
+		//       }
+
+		//       _appContext.Products.Remove(product);
+		//       _appContext.SaveChanges();
+
+		//    return NoContent();
+		//      }
+
+		//   [HttpPatch("{id}")]
+		//   public IActionResult Patch(Guid id, [FromBody]JsonPatchDocument<Product> patchDocument)
+		//   {
+		//    if (patchDocument == null)
+		//    {
+		//	    return BadRequest();
+		//    }
+
+		//    var product = _appContext.Products.Find(id);
+		//    if (product == null)
+		//    {
+		//	    return NotFound();
+		//    }
+
+		//	patchDocument.ApplyTo(product);
+
+		//    TryValidateModel(product);
+		//    if (!ModelState.IsValid)
+		//    {
+		//	    return BadRequest(ModelState);
+		//    }
+
+		//    _appContext.SaveChanges();
+
+		//    return NoContent();
+		//   }
+
+		//[HttpGet("{id}/tags")]
+		//public IActionResult GetProductTags(Guid id)
+		//{
+		//	var product = _appContext.Products.Include(x => x.Tags).FirstOrDefault(x => x.ProductId == id);
+
+		//	if (product == null)
+		//	{
+		//		return NotFound();
+		//	}
+
+		//	return Ok(product.Tags);
+		//}
+
+		//[HttpOptions("{id}/tags")]
+		//public IActionResult GetProductTagsOptions(Guid id)
+		//{
+		//	Response.Headers.Add("Allow",  "GET,OPTIONS");
+
+		//	return Ok();
+		//}
 	}
 }
