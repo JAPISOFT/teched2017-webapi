@@ -6,7 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="AppFilters\" />
     <Folder Include="AppMiddlewares\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>

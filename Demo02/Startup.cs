@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Demo02.AppFilters;
 using Demo02.Lib.Entities;
 using Demo02.Lib.Facades;
 using Demo02.Lib.Repositories;
@@ -40,7 +41,8 @@ namespace Demo02
 		    {
 				setup.InputFormatters.Add(new XmlSerializerInputFormatter());
 				setup.OutputFormatters.Add(new XmlSerializerOutputFormatter());
-			});
+			    setup.Filters.Add(new AppExceptionFilter());
+		    });
 
 		    mvc.AddJsonOptions(options =>
 		    {
