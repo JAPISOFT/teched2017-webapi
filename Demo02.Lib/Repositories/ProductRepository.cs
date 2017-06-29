@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Demo02.Lib.Repositories
 {
-    public class ProductRepository
+	public class ProductRepository
     {
 	    private readonly DemoContext _context;
 	    private readonly DbSet<Product> _set;
@@ -19,7 +19,7 @@ namespace Demo02.Lib.Repositories
 
 	    public async Task<Product> GetById(Guid id)
 	    {
-		    return await _set.FindAsync(id);
+		    return await _set.Include(x => x.Tags).FirstOrDefaultAsync(x => x.ProductId == id);
 	    }
 
 	    public async Task<List<Product>> GetAllWithTags()

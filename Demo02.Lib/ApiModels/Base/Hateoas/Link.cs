@@ -14,6 +14,7 @@ namespace Demo02.Lib.ApiModels.Base.Hateoas
 
 		public string Href { get; set; }
 		public string Rel { get; set; }
+		public string Description { get; set; }
 	    public string Method { get; set; } = MethodGet;
     }
 }

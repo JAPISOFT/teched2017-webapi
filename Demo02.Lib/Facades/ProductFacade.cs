@@ -10,20 +10,26 @@ namespace Demo02.Lib.Facades
 {
     public class ProductFacade
     {
-	    private readonly UnitOfWork _uow;
+	    private readonly UnitOfWork _unitOfWork;
 
-	    public ProductFacade(UnitOfWork uow)
+	    public ProductFacade(UnitOfWork unitOfWork)
 	    {
-		    this._uow = uow;
+		    _unitOfWork = unitOfWork;
 	    }
 
 	    public async Task<List<ProductApiModel>> GetProducts()
 	    {
-		    var products = await _uow.Products.GetAllWithTags();
-		    var result = products.Select(p => new ProductApiModel()
+		    var products = await _unitOfWork.Products.GetAllWithTags();
+		    var result = products.Select(product => new ProductApiModel
 		    {
-			    ProductId = p.ProductId,
-				Title = p.Title
+			    ProductId = product.ProductId,
+			    Title = product.Title,
+				Tags = product.Tags.Select(tag => new TagApiModel
+				{
+					ProductId = tag.ProductId,
+					Name =tag.Name,
+					TagId = tag.TagId
+				}).ToList()
 		    }).ToList();
 
 		    return result;
@@ -31,27 +37,45 @@ namespace Demo02.Lib.Facades
 
 	    public async Task<ProductApiModel> GetProduct(Guid id)
 	    {
-		    var product = await _uow.Products.GetById(id);
+		    var product = await _unitOfWork.Products.GetById(id);
 		    var result = product != null
 			    ? new ProductApiModel
 			    {
 				    ProductId = product.ProductId,
-				    Title = product.Title
+				    Title = product.Title,
+					Tags = product.Tags.Select(tag => new TagApiModel
+					{
+						ProductId = tag.ProductId,
+						Name =tag.Name,
+						TagId = tag.TagId
+					}).ToList()
 			    }
 			    : null;
 
 		    return result;
 	    }
 
+	    public async Task<List<TagApiModel>> GetProductTags(Guid productId)
+	    {
+		    var tags = await _unitOfWork.Tags.GetByProductId(productId);
+
+		    return tags.Select(tag => new TagApiModel
+		    {
+				ProductId = tag.ProductId,
+				Name = tag.Name,
+				TagId = tag.TagId
+		    }).ToList();
+	    }
+
 	    public async Task<ProductApiModel> CreateProduct(ProductApiModelCreate model)
 	    {
-		    var product = new Product()
+		    var product = new Product
 		    {
-			    Title = model.Title,
+			    Title = model.Title
 		    };
 
-			_uow.Products.Insert(product);
-			_uow.Save();
+			_unitOfWork.Products.Insert(product);
+			_unitOfWork.Save();
 
 		    return await GetProduct(product.ProductId);
 	    }

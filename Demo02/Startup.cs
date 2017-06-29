@@ -35,6 +35,7 @@ namespace Demo02
 		    services.AddDbContext<DemoContext>();
 			services.AddScoped<ProductFacade>();
 			services.AddScoped<ProductRepository>();
+			services.AddScoped<TagRepository>();
 			services.AddScoped<UnitOfWork>();
 
 		    var mvc = services.AddMvc(setup =>
@@ -121,6 +122,19 @@ namespace Demo02
 					}
 				}
 			);
+
+		    dbContext.Products.Add(
+			    new Product
+			    {
+				    ProductId = Guid.Parse("86f19a80-0be9-413d-8b6f-ac13859aba85"),
+				    Title = "Hekler Koch P30 SK",
+				    Tags = new List<Tag>
+				    {
+					    new Tag {TagId = Guid.Parse("dcc2839c-227c-4f00-819c-3d9dde40ad5e"), Name = "Hekler Koch"},
+					    new Tag {TagId = Guid.Parse("75117aa5-abd9-4e47-8050-9aa5ef65665e"), Name = "Germany"}
+				    }
+			    }
+		    );
 
 		    dbContext.SaveChanges();
 	    }
